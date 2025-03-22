@@ -1,4 +1,5 @@
 import React from "react";
+import {useState} from "react"
 
 import {BrowserRouter as Router, Link} from "react-router-dom"
 
@@ -13,22 +14,27 @@ export default function Login() {
     formState: { errors },
   } = useForm();
 
-  const onSubmit = async (data) => {
-    console.log(data);
-    // await fetch("http://localhost:5000/save/user",
-    //   {
-    //     method: 'POST',
-    //     headers: {
-    //       'Content-Type': 'application/json'
-    //   },
-    //   body: JSON.stringify({
-    //     name: 'John Doe',
-    //     email: 'johndoe@example.com',
-    //     age: 30
-    // })
-    //   }
+  const [data, setData] = useState({})
 
-    // )
+  const onSubmit = async (data) => {
+
+    await fetch("http://localhost:5000/authenticate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: data.email,
+        password: data.password
+      }),
+    }).then(
+      res => res.json()
+    ).then(
+      data => setData(data)
+    )
+
+
+
   }
 
   return (
@@ -51,6 +57,10 @@ export default function Login() {
       
       <h6 className="text-lg text-slate-600">New User? <Link className="text-blue-600 underline" to={"/signup"}>Signup</Link></h6>
       
+
+      <h5>
+            {(data) && (<span className="text-red-500">{data.message}</span>)}
+          </h5>
 
     </div>
   );
