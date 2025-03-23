@@ -1,12 +1,38 @@
 import React from "react";
-import {useState} from "react"
+import {useState, useEffect} from "react"
 
-import {BrowserRouter as Router, Link} from "react-router-dom"
+import {BrowserRouter as Router, Link, useNavigate} from "react-router-dom"
 
 import { useForm } from "react-hook-form";
 
 
 export default function Login() {
+
+  const navigate = useNavigate()
+
+  useEffect(() => {
+      const checkAuth = async () => {
+        try {
+          const response = await fetch("http://localhost:5000/authCheck", {
+            method: "GET",
+            credentials: "include", // Ensure cookies are sent
+          });
+          const data = await response.json()
+          console.log(data.authCheck)
+          if (data.authCheck){
+              navigate("/todo")
+          }
+        }
+        catch(err) {
+          console.log(err)
+        }
+      }
+      checkAuth()
+    }, []
+  
+  );
+
+
   const {
     register,
     handleSubmit,
@@ -20,6 +46,7 @@ export default function Login() {
 
     await fetch("http://localhost:5000/authenticate", {
       method: "POST",
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
       },
@@ -30,7 +57,12 @@ export default function Login() {
     }).then(
       res => res.json()
     ).then(
-      data => setData(data)
+      (data) => {
+        setData(data);
+        if (data.isAuthenticated === true){
+          navigate("/todo")
+        }
+      }
     )
 
 
@@ -65,3 +97,4 @@ export default function Login() {
     </div>
   );
 }
+

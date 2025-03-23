@@ -1,9 +1,35 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 
-import { BrowserRouter as Router, Link } from "react-router-dom";
+import { BrowserRouter as Router, Link, useNavigate } from "react-router-dom";
 
 export default function Signup() {
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+      const checkAuth = async () => {
+        try {
+          const response = await fetch("http://localhost:5000/authCheck", {
+            method: "GET",
+            credentials: "include", // Ensure cookies are sent
+          });
+          const data = await response.json()
+          console.log(data.authCheck)
+          if (data.authCheck){
+              navigate("/todo")
+          }
+        }
+        catch(err) {
+          console.log(err)
+        }
+      }
+      checkAuth()
+    }, []
+  
+  );
+
+
   const {
     register,
     handleSubmit,

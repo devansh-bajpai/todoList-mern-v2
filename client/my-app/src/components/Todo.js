@@ -2,8 +2,34 @@ import React from "react";
 import { useState, useEffect } from "react";
 
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 
 export default function Todo() {
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/authCheck", {
+          method: "GET",
+          credentials: "include", // Ensure cookies are sent
+        });
+        const data = await response.json()
+        console.log(data.authCheck)
+        if (!data.authCheck){
+            navigate("/login")
+        }
+      }
+      catch(err) {
+        console.log(err)
+      }
+    }
+    checkAuth()
+  }, []
+
+);
+
   const {
     register,
     handleSubmit,
@@ -17,12 +43,26 @@ export default function Todo() {
       <div className="w-full font-mono pl-2 text-lg">Welcome, User</div>
       <h1 className="text-3xl font-mono mt-3">TODO</h1>
 
-      <form className="flex flex-col w-full h-20 items-center mt-5" onSubmit={handleSubmit(onSubmit)}>
+      <form
+        className="flex flex-col w-full h-20 items-center mt-5"
+        onSubmit={handleSubmit(onSubmit)}
+      >
         <div className="w-full">
-        <input className="w-[70%] bg-white h-10 rounded-l-md ml-5 pl-5 outline-none" placeholder="New Task" {...register("task", {required: {value: true, message: "This field is required"}})} />
-        <input className="w-[20%] bg-lime-300 rounded-r-md h-10 hover:bg-lime-400 duration-500" type="submit" />
+          <input
+            className="w-[70%] bg-white h-10 rounded-l-md ml-5 pl-5 outline-none"
+            placeholder="New Task"
+            {...register("task", {
+              required: { value: true, message: "This field is required" },
+            })}
+          />
+          <input
+            className="w-[20%] bg-lime-300 rounded-r-md h-10 hover:bg-lime-400 duration-500"
+            type="submit"
+          />
         </div>
-        {errors.task && <span className="text-red-500">{errors.task.message}</span>}
+        {errors.task && (
+          <span className="text-red-500">{errors.task.message}</span>
+        )}
       </form>
 
       <div className="bg-zinc-100 w-full h-90">
